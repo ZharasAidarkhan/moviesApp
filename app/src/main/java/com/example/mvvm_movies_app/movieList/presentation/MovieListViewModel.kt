@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.mvvm_movies_app.movieList.domain.repository.MovieListRepository
 import com.example.mvvm_movies_app.movieList.util.Category
+import com.example.mvvm_movies_app.movieList.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -55,14 +56,72 @@ class MovieListViewModel @Inject constructor(
                 Category.POPULAR,
                 movieListState.value.popularMovieListPage
             ).collectLatest {result ->
-//                when(result) {
-//
-//                }
+                when(result) {
+                    is Resource.Error -> {
+                        _movieListState.update {
+                            it.copy(isLoading = false)
+                        }
+                    }
+
+                    is Resource.Success -> {
+                        result.data?.let { popularList ->
+                            _movieListState.update {
+                                it.copy(
+                                    popularMovieList = movieListState.value.popularMovieList
+                                             + popularList.shuffled(),
+                                    popularMovieListPage = movieListState.value.popularMovieListPage
+                                )
+                            }
+                        }
+                    }
+
+                    is Resource.Loading -> {
+                        _movieListState.update {
+                            it.copy(isLoading = result.isLoading)
+                        }
+                    }
+                }
             }
         }
     }
 
     private fun getUpcomingMovieList(forceFetchFromRemote: Boolean) {
+        viewModelScope.launch{
+            _movieListState.update {
+                it.copy(isLoading = true)
+            }
 
+            movieListRepository.getMovieList(
+                forceFetchFromRemote,
+                Category.UPCOMING,
+                movieListState.value.upcomingMovieListPage
+            ).collectLatest {result ->
+                when(result) {
+                    is Resource.Error -> {
+                        _movieListState.update {
+                            it.copy(isLoading = false)
+                        }
+                    }
+
+                    is Resource.Success -> {
+                        result.data?.let { upcomingList ->
+                            _movieListState.update {
+                                it.copy(
+                                    upcomingMovieList = movieListState.value.upcomingMovieList
+                                            + upcomingList.shuffled(),
+                                    upcomingMovieListPage = movieListState.value.upcomingMovieListPage + 1
+                                )
+                            }
+                        }
+                    }
+
+                    is Resource.Loading -> {
+                        _movieListState.update {
+                            it.copy(isLoading = result.isLoading)
+                        }
+                    }
+                }
+            }
+        }
     }
 }

@@ -17,7 +17,7 @@ class MovieEntity(
     val title: String,
     val video: Boolean,
     val vote_average: Double,
-    val vote_count: Number,
+    val vote_count: Int,
 
     @PrimaryKey
     val id: Int,
