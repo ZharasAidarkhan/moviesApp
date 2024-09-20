@@ -1,8 +1,9 @@
 package com.example.mvvm_movies_app.movieList.presentation
 
 import com.example.mvvm_movies_app.movieList.domain.model.Movie
+import javax.inject.Inject
 
-data class MovieListState(
+data class MovieListState (
     val isLoading: Boolean = false,
 
     val popularMovieListPage: Int = 1,

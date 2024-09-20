@@ -1,7 +1,5 @@
 package com.example.mvvm_movies_app.core.presentation
 
-import android.media.metrics.Event
-import androidx.collection.mutableIntSetOf
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -25,6 +23,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -48,21 +47,22 @@ fun HomeScreen(navController: NavHostController) {
 
     Scaffold(
         bottomBar = {
-                    BottomNavigationBar(
-                        bottomNavController = bottomNavController,
-                        onEvent = movieListViewModel::onEvent
-                        )
+            BottomNavigationBar(
+                bottomNavController = bottomNavController,
+                onEvent = movieListViewModel::onEvent
+            )
         },
         topBar = {
-            TopAppBar(title = {
-                Text(
-                    text = if(movieState.isCurrentPopularScreen)
-                    "Popular Movies"
-                    else
-                    "Upcoming Movies",
-                    fontSize = 20.sp
-                )
-            },
+            TopAppBar(
+                title = {
+                    Text(
+                        text = if (movieState.isCurrentPopularScreen)
+                            "Popular Movies"
+                        else
+                            "Upcoming Movies",
+                        fontSize = 20.sp
+                    )
+                },
                 modifier = Modifier.shadow(2.dp),
                 colors = TopAppBarDefaults.smallTopAppBarColors(
                     MaterialTheme.colorScheme.inverseOnSurface
@@ -75,13 +75,23 @@ fun HomeScreen(navController: NavHostController) {
                 .fillMaxSize()
                 .padding(it)
         ) {
-            NavHost(navController = bottomNavController,
-                    startDestination = Screen.PopularMovieList.rout) {
+            NavHost(
+                navController = bottomNavController,
+                startDestination = Screen.PopularMovieList.rout
+            ) {
                 composable(Screen.PopularMovieList.rout) {
-//                    PopularMoviesScreen()
+                    PopularMoviesScreen(
+                        navController = navController,
+                        movieListState = movieState,
+                        onEvent = movieListViewModel::onEvent
+                    )
                 }
-                composable(Screen.PopularMovieList.rout) {
-//                    PopularMoviesScreen()
+                composable(Screen.UpcomingMovieList.rout) {
+                    UpComingMoviesScreen(
+                        navController = navController,
+                        movieListState = movieState,
+                        onEvent = movieListViewModel::onEvent
+                    )
                 }
             }
         }
@@ -98,11 +108,13 @@ fun BottomNavigationBar(
     val items = listOf(
         BottomItem(
             title = "Popular",
-            icon = Icons.Rounded.Movie
+            icon = Icons.Rounded.Movie,
+            textColor = Color.White
         ),
         BottomItem(
             title = "Upcoming",
-            icon = Icons.Rounded.Upcoming
+            icon = Icons.Rounded.Upcoming,
+            textColor = Color.White
         )
     )
 
@@ -112,36 +124,39 @@ fun BottomNavigationBar(
 
     NavigationBar {
         Row(
-            modifier = Modifier.background(MaterialTheme.colorScheme.inverseSurface)
+            modifier = Modifier.background(MaterialTheme.colorScheme.background)
         ) {
             items.forEachIndexed { index, bottomItem ->
                 NavigationBarItem(
                     selected = selected.intValue == index,
                     onClick = {
-                              selected.intValue = index
-                              when(selected.intValue) {
-                                  0 -> {
-                                      onEvent(MovieListUiEvent.Navigate)
-                                      bottomNavController.popBackStack()
-                                      bottomNavController.navigate(Screen.PopularMovieList.rout)
-                                  }
-                                  1 -> {
-                                      onEvent(MovieListUiEvent.Navigate)
-                                      bottomNavController.popBackStack()
-                                      bottomNavController.navigate(Screen.UpcomingMovieList.rout)
-                                  }
-                              }
+                        selected.intValue = index
+                        when (selected.intValue) {
+                            0 -> {
+                                onEvent(MovieListUiEvent.Navigate)
+                                bottomNavController.popBackStack()
+                                bottomNavController.navigate(Screen.PopularMovieList.rout)
+                            }
+
+                            1 -> {
+                                onEvent(MovieListUiEvent.Navigate)
+                                bottomNavController.popBackStack()
+                                bottomNavController.navigate(Screen.UpcomingMovieList.rout)
+                            }
+                        }
                     },
                     icon = {
-                        Icon(imageVector = bottomItem.icon,
+                        Icon(
+                            imageVector = bottomItem.icon,
                             contentDescription = bottomItem.title,
-                            tint = MaterialTheme.colorScheme.onBackground
-                            )
+                            tint = MaterialTheme.colorScheme.inverseSurface
+                        )
                     },
                     label = {
-                        Text(text = bottomItem.title,
-                             color = MaterialTheme.colorScheme.onBackground
-                            )
+                        Text(
+                            text = bottomItem.title,
+                            color = MaterialTheme.colorScheme.inverseSurface
+                        )
                     }
                 )
             }
@@ -152,7 +167,8 @@ fun BottomNavigationBar(
 
 data class BottomItem(
     val title: String,
-    val icon: ImageVector
+    val icon: ImageVector,
+    val textColor: Color
 )
 
 

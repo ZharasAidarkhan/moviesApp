@@ -21,6 +21,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.mvvm_movies_app.details.presentation.DetailsScreen
 import com.example.mvvm_movies_app.movieList.presentation.MovieListViewModel
 import com.example.mvvm_movies_app.movieList.util.Screen
 import com.example.mvvm_movies_app.ui.theme.MVVM_Movies_AppTheme
@@ -54,8 +55,8 @@ class MainActivity : ComponentActivity() {
                             arguments = listOf(
                                 navArgument("movieId") {type = NavType.IntType}
                             )
-                            ) {backStackEntry ->
-//                            DetailsScreen(backStackEntry)
+                            ) {
+                            DetailsScreen()
                         }
                     }
                 }
